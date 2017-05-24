@@ -54,3 +54,4 @@ Deflash_Handler.tds
 *.dsk
 Deflash_Handler.dsk
 DataBase/JDataDB.mdb
+GlobalFunLib.lib
