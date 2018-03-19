@@ -255,6 +255,78 @@ int __fastcall TGlobalFuction::DivideByIndicator(AnsiString sSrc, TStringList * 
 }
 //---------------------------------------------------------------------------
 
+/**
+* @fn      : int __fastcall TGlobalFuction::StringToken(String sSrc, TStringList * sList, char cIndicator, bool bTrim)
+* @brief : sSrc로 주어진 문자열을 cIndicator에 해당되는 문자로 구분하여 잘라 sList에 넣어준다. 
+           잘려진 문자열의 처음과 끝부분의 공백은 bTrim인자가 true이면 삭제하고 false이면 유지한다. 
+* @param String sSrc : 
+* @param TStringList * sList : 
+* @param wchar_t * sIndicator : 구분자로 사용할 케릭터를 문자열로 설정한다. (ex: L","콤마로 구분,   L";," 세미콜론과 콤마를 구분자로 사용)
+* @param bool bTrim : 잘라진 문자열을 Trim 할지 여부 결정. 
+* @return int : 
+* @see 
+- history  : 1. [2017년 11월 17일 금요일][Song Shin Young] First. 
+**/
+int __fastcall TGlobalFuction::StringToken(String sSrc, TStringList * sList, wchar_t *sIndicator, bool bTrim)
+{
+    if(sList == NULL) return 0;
+    else if(sSrc.Length() == 0) return 0;
+
+    int nDivideCnt = 0; // Divide Count
+
+    wchar_t *wstr = sSrc.w_str();
+    wchar_t *tk = wcstok(wstr, sIndicator);
+
+    while (tk != NULL)
+    {
+        nDivideCnt += 1;    
+        sList->Add(tk);
+        if(bTrim) {
+            sList->Strings[sList->Count-1] = sList->Strings[sList->Count-1].Trim();
+        }
+        tk = wcstok(NULL, sIndicator);
+    }
+
+    return nDivideCnt;
+}
+//---------------------------------------------------------------------------
+/**
+* @fn      : int __fastcall TGlobalFuction::StringToken(AnsiString sSrc, TStringList * sList, char cIndicator, bool bTrim)
+* @brief : sSrc로 주어진 문자열을 cIndicator에 해당되는 문자로 구분하여 잘라 sList에 넣어준다. 
+           잘려진 문자열의 처음과 끝부분의 공백은 bTrim인자가 true이면 삭제하고 false이면 유지한다. 
+* @param AnsiString sSrc : 
+* @param TStringList * sList : 
+* @param char * sIndicator : 구분자로 사용할 케릭터를 문자열로 설정한다. (ex: ","콤마로 구분,   ";," 세미콜론과 콤마를 구분자로 사용)
+* @param bool bTrim : 잘라진 문자열을 Trim 할지 여부 결정. 
+* @return int : 
+* @see     : 
+- history  : 1. [2017년 11월 17일 금요일][Song Shin Young] First. 
+**/
+int __fastcall TGlobalFuction::StringToken(AnsiString sSrc, TStringList * sList, char * sIndicator, bool bTrim)
+{
+    if(sList == NULL) return 0;
+    else if(sSrc.Length() == 0) return 0;
+
+    int nDivideCnt = 0; // Divide Count
+
+    char *str = sSrc.c_str();
+    char *tk = strtok(str, sIndicator);
+
+    while (tk != NULL)
+    {
+        nDivideCnt += 1;
+        sList->Add(tk);
+        if(bTrim) {
+            sList->Strings[sList->Count-1] = sList->Strings[sList->Count-1].Trim();
+        }        
+        tk = strtok(NULL, sIndicator);
+    }
+
+    return nDivideCnt;    
+}
+//---------------------------------------------------------------------------
+
+
 /** 
 * @brief : TPanel위에 TLabel로 Caption을 구현하여 버튼처럼 만든 것을 
            선택된 상태로 그려주는 함수이다. 
@@ -1760,7 +1832,7 @@ bool __fastcall TGlobalFuction::DirectoryCopy(AnsiString sSrcPath, AnsiString sT
                 if(slSkipDirectory != NULL) {
                     for(int i=0; i<slSkipDirectory->Count; i++){
 
-                        // Copy를 Skip해야하는 Directory일 경우 복사하지 않는다.
+                        // Copy를 Skip해야하는 파일일 경우 복사하지 않는다.
                         AnsiString sSkipFile = slSkipDirectory->Strings[i];
                         if(stricmp(sSrcPathTemp.c_str(), sSkipFile.c_str()) == 0){
                             bCopySkip = true;

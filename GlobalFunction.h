@@ -110,6 +110,11 @@ public:
     int  __fastcall DivideByIndicator(AnsiString sSrc, TStringList * sList, char cIndicator);
 
 
+    int __fastcall StringToken(String sSrc, TStringList * sList, wchar_t * sIndicator, bool bTrim);
+    
+    int __fastcall StringToken(AnsiString sSrc, TStringList * sList, char * sIndicator, bool bTrim);
+
+
     /** Panel_Down_ActionColor()
     * @brief : TPanel위에 TLabel로 Caption을 구현하여 버튼처럼 만든 것을 
                선택된 상태로 그려주는 함수이다. 
@@ -919,5 +924,45 @@ public:
     }
 };
 
+//---------------------------------------------------------------------------
+
+typedef void __fastcall (__closure *TClientSocketThreadEvent)(System::TObject* Sender, int Index);
+
+class CClientSocketThread
+{
+    class TClientSocketThread : public TThread
+    {
+    private:
+        TClientSocketThreadEvent    OnEvent;
+        TObject*                    m_Sender;
+        int                         m_Index;
+
+    public:
+        __fastcall TClientSocketThread(System::TObject* Sender, TClientSocketThreadEvent event, int idx)
+            : TThread(false)
+        {
+            FreeOnTerminate = true;
+            OnEvent     = event;
+            m_Sender    = Sender;
+            m_Index     = idx;
+        }   
+
+        void __fastcall Execute()
+        {
+            try {
+                if(OnEvent != NULL) OnEvent(m_Sender, m_Index);
+            }
+            __finally {
+
+            }
+        }
+    };
+
+public:
+    CClientSocketThread(System::TObject* Sender, TClientSocketThreadEvent event, int idx)
+    {
+        TClientSocketThread*  thread = new TClientSocketThread(Sender, event, idx);
+    }
+};
 
 #endif
