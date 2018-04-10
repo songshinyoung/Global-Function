@@ -4,7 +4,7 @@
 #define GlobalFunctionH
 //---------------------------------------------------------------------------
 
-#define GlobalFunctionVer 0x1001
+#define GlobalFunctionVer 0x1002
 #include <System.Classes.hpp>
 #include <Vcl.Controls.hpp>
 #include <Vcl.Graphics.hpp>
@@ -110,9 +110,9 @@ public:
     int  __fastcall DivideByIndicator(AnsiString sSrc, TStringList * sList, char cIndicator);
 
 
-    int __fastcall StringToken(String sSrc, TStringList * sList, wchar_t * sIndicator, bool bTrim);
+    int __fastcall StringToken(String &sSrc, TStringList * sList, wchar_t * sIndicator, bool bTrim);
     
-    int __fastcall StringToken(AnsiString sSrc, TStringList * sList, char * sIndicator, bool bTrim);
+    int __fastcall StringToken(AnsiString &sSrc, TStringList * sList, char * sIndicator, bool bTrim);
 
 
     /** Panel_Down_ActionColor()
@@ -510,8 +510,13 @@ public:
     * @see 
     - history : 1. [2015년 11월 24일 화요일][송신영] 최초 작성 
     **/    
-   bool __fastcall DirectoryCopy(AnsiString sSrcPath, AnsiString sTrgPath, TStringList * slSkipDirectory);
-  
+    bool __fastcall DirectoryCopy(AnsiString sSrcPath, AnsiString sTrgPath, TStringList * slSkipDirectory);
+
+   
+    bool __fastcall DirRename(const char * sOldname,const char * sNewname);
+
+    bool __fastcall FileRename(const char * sOldname,const char * sNewname);
+
     /** ShowDirSelectDlg()
     * @brief : 디렉토리 경로를 탐색하여 해당 경로를 지정해주는 다이얼로그 창을 출력한다. 
                사용 방법 
@@ -543,6 +548,18 @@ public:
     AnsiString  __fastcall GetApplicationDir() ; // SSY_13.10.10 [ 실행파일이 존재하는 Root 폴더 절대 경로  ] 
 
 
+    /**
+    * @fn      : char __fastcall TGlobalFuction::GetApplicationDiskName()
+    * @brief   : 
+    * @details : 현재 실행 파일이 있는 Disk의 이름을 리턴하는 함수. 
+    * @param   : None
+    * @return  : char : 찾으면 찾은 Disk Name을 리턴하고 모찾으면 '\0' 를 리턴한다. 
+    * @see     : 
+    - history  : 1. [2018년 1월 25일 목요일][Song Shin Young] First. 
+    **/
+    char __fastcall GetApplicationDiskName() ;
+
+
     /** GetMD5HashCodeFromFile()
     * @brief : File의 MD5 Hash Code를 생성하는 함수이다. 
     * @param __in LPCSTR filename : 파일 이름(전체 경로)
@@ -569,6 +586,16 @@ public:
     bool        __fastcall DriveExists(char cDriveName, bool bOnlyHDD = false);
 
 
+    /**
+    * @fn      : double __fastcall TGlobalFuction::GetDiskFreeSpace(char cDrive)
+    * @brief   : 
+    * @details : 주어진 디스크의 여유 공간을 MByte 단위로 리턴하는 함수 
+    * @param   : char cDrive : 
+    * @return  : double : 여유 공간 MByte
+    * @see     : 
+    - history  : 1. [2018년 1월 25일 목요일][Song Shin Young] First. 
+    **/
+    double      __fastcall GetDiskFreeSpace(char cDrive);
 
 
 
@@ -771,6 +798,21 @@ public:
     - history : 1. [2015년 10월 23일 금요일][송신영] 최초 작성 
     **/
     void __fastcall ReplaceStr(AnsiString &sStr, AnsiString sS, AnsiString sT);
+
+
+    /**
+    * @fn      : int __fastcall TGlobalFuction::StringPos(const AnsiString & sSrcStr, AnsiString sSearch, Cardinal InitPos)
+    * @brief   : 
+    * @details : 주어진 문자열에서 시작 위치 부터 검색 문자열이 찾아지는 위치 값을 리턴 함. (찾은 경우 1 이상의 값을 리턴)
+    * @param   : const AnsiString & sSrcStr : 
+    * @param   : AnsiString sSearch : 
+    * @param   : Cardinal InitPos : 
+    * @return  : int : 0 : 못찾음, 1이상 : 찾은 문자열 위치 
+    * @see     : 
+    - history  : 1. [2018년 1월 17일 수요일][Song Shin Young] First. 
+    **/
+    int __fastcall StringPos(const AnsiString & sSrcStr, AnsiString sSearch, Cardinal InitPos);
+
 
     //---------------------------------------------------------------------------
     // TCP / IP

@@ -267,14 +267,19 @@ int __fastcall TGlobalFuction::DivideByIndicator(AnsiString sSrc, TStringList * 
 * @see 
 - history  : 1. [2017년 11월 17일 금요일][Song Shin Young] First. 
 **/
-int __fastcall TGlobalFuction::StringToken(String sSrc, TStringList * sList, wchar_t *sIndicator, bool bTrim)
+int __fastcall TGlobalFuction::StringToken(String &sSrc, TStringList * sList, wchar_t *sIndicator, bool bTrim)
 {
     if(sList == NULL) return 0;
     else if(sSrc.Length() == 0) return 0;
 
     int nDivideCnt = 0; // Divide Count
+    int nStrCnt = sSrc.Length() + 1;
 
-    wchar_t *wstr = sSrc.w_str();
+    // 원본을 회손하지 않기 위해 버퍼를 만들어 사용한다. 
+    wchar_t *wstr = new wchar_t[nStrCnt];
+    ZeroMemory(wstr, sizeof(wchar_t) * nStrCnt);
+    memcpy(wstr, sSrc.w_str(), sizeof(wchar_t) * sSrc.Length());
+    
     wchar_t *tk = wcstok(wstr, sIndicator);
 
     while (tk != NULL)
@@ -286,13 +291,15 @@ int __fastcall TGlobalFuction::StringToken(String sSrc, TStringList * sList, wch
         }
         tk = wcstok(NULL, sIndicator);
     }
-
+    
+    delete[] wstr;
+    
     return nDivideCnt;
 }
 //---------------------------------------------------------------------------
 /**
-* @fn      : int __fastcall TGlobalFuction::StringToken(AnsiString sSrc, TStringList * sList, char cIndicator, bool bTrim)
-* @brief : sSrc로 주어진 문자열을 cIndicator에 해당되는 문자로 구분하여 잘라 sList에 넣어준다. 
+* @fn      : int __fastcall TGlobalFuction::StringToken(AnsiString sSrc, TStringList * sList, char *sIndicator, bool bTrim)
+* @brief : sSrc로 주어진 문자열을 sIndicator 해당되는 문자로 구분하여 잘라 sList에 넣어준다. 
            잘려진 문자열의 처음과 끝부분의 공백은 bTrim인자가 true이면 삭제하고 false이면 유지한다. 
 * @param AnsiString sSrc : 
 * @param TStringList * sList : 
@@ -302,14 +309,18 @@ int __fastcall TGlobalFuction::StringToken(String sSrc, TStringList * sList, wch
 * @see     : 
 - history  : 1. [2017년 11월 17일 금요일][Song Shin Young] First. 
 **/
-int __fastcall TGlobalFuction::StringToken(AnsiString sSrc, TStringList * sList, char * sIndicator, bool bTrim)
+int __fastcall TGlobalFuction::StringToken(AnsiString &sSrc, TStringList * sList, char * sIndicator, bool bTrim)
 {
     if(sList == NULL) return 0;
     else if(sSrc.Length() == 0) return 0;
 
     int nDivideCnt = 0; // Divide Count
 
-    char *str = sSrc.c_str();
+    // 원본을 회손하지 않기 위해 버퍼를 만들어 사용한다. 
+    char *str = new char[sSrc.Length() + 1];
+    ZeroMemory(str, sSrc.Length() + 1);
+    memcpy(str, sSrc.c_str(), sSrc.Length());
+    
     char *tk = strtok(str, sIndicator);
 
     while (tk != NULL)
@@ -321,6 +332,8 @@ int __fastcall TGlobalFuction::StringToken(AnsiString sSrc, TStringList * sList,
         }        
         tk = strtok(NULL, sIndicator);
     }
+
+    delete[] str;
 
     return nDivideCnt;    
 }
@@ -697,7 +710,7 @@ AnsiString __fastcall TGlobalFuction::GetLastDirName(AnsiString sPath)
 AnsiString __fastcall TGlobalFuction::GetFileExt(AnsiString sFileName)
 {
     sFileName = ExtractFileExt(sFileName);
-    if(sFileName.c_str()[0] == '.') {
+    if((sFileName != "") && (sFileName.c_str()[0] == '.')) {
         sFileName = sFileName.SubString(2, sFileName.Length()-1);
     }
 
@@ -1223,6 +1236,8 @@ bool __fastcall TGlobalFuction::DeleteOldTimeFile(AnsiString  sSrcPath, TDateTim
 
     bool bAllFileDelete = true;
     DeleteLastSlash(sSrcPath);
+
+    if(sSrcPath == "") return false;
 
     AnsiString sSrc = sSrcPath + "\\*.*";
     TSearchRec sr;
@@ -1858,6 +1873,47 @@ bool __fastcall TGlobalFuction::DirectoryCopy(AnsiString sSrcPath, AnsiString sT
 
 
 
+bool __fastcall TGlobalFuction::DirRename(const char * sOldname,const char * sNewname)
+{
+    assert(sOldname != NULL);
+    assert(sNewname != NULL);
+
+    if(!DirectoryExists(sOldname)) return false;
+    
+	//이름을 바꾸고 결과를 리턴 받는다.
+	int nResult = rename( sOldname, sNewname );
+
+	if( nResult == 0 ) {
+		return true;
+	}
+	else {
+		return false;
+	}
+
+	return 0;
+
+}
+
+bool __fastcall TGlobalFuction::FileRename(const char * sOldname,const char * sNewname)
+{
+    assert(sOldname != NULL);
+    assert(sNewname != NULL);
+
+    if(!FileExists(sOldname)) return false;
+    
+	//이름을 바꾸고 결과를 리턴 받는다.
+	int nResult = rename( sOldname, sNewname );
+
+	if( nResult == 0 ) {
+		return true;
+	}
+	else {
+		return false;
+	}
+
+	return 0;
+
+}
 
 
 //---------------------------------------------------------------------------
@@ -1961,6 +2017,23 @@ AnsiString __fastcall TGlobalFuction::GetApplicationDir()
     return sPath;
 }
 
+/**
+* @fn      : char __fastcall TGlobalFuction::GetApplicationDiskName()
+* @brief   : 
+* @details : 현재 실행 파일이 있는 Disk의 이름을 리턴하는 함수. 
+* @param   : None
+* @return  : char : 찾으면 찾은 Disk Name을 리턴하고 모찾으면 '\0' 를 리턴한다. 
+* @see     : 
+- history  : 1. [2018년 1월 25일 목요일][Song Shin Young] First. 
+**/
+char __fastcall TGlobalFuction::GetApplicationDiskName() 
+{
+    // 각종 경로 설정. --------------------------------
+    AnsiString sDrive = ExtractFileDrive(Application->ExeName);
+    if(sDrive == "") return '\0';
+    
+    return sDrive.c_str()[0];
+}
 
 
 /** 
@@ -2154,8 +2227,26 @@ bool        __fastcall TGlobalFuction::DriveExists(char cDriveName, bool bOnlyHD
 
 
 
+/**
+* @fn      : double __fastcall TGlobalFuction::GetDiskFreeSpace(char cDrive)
+* @brief   : 
+* @details : 주어진 디스크의 여유 공간을 MByte 단위로 리턴하는 함수 
+* @param   : char cDrive : 
+* @return  : double : 여유 공간 MByte
+* @see     : 
+- history  : 1. [2018년 1월 25일 목요일][Song Shin Young] First. 
+**/
+double __fastcall TGlobalFuction::GetDiskFreeSpace(char cDrive)
+{   
+    int nDriveIndex = cDrive == '\0' ? 0 : cDrive - 'A' + 1;
+    
+    //__int64 전체용량 = DiskSize(nDriveIndex);   // 0: 현재 디스크, 1:A, 2:B, 3:C, 4:D ...... 
+    __int64 nFreeSpace = DiskFree(nDriveIndex);
 
+    double dFreeSpaceMByte = (nFreeSpace >> 10) / 1024.0;
 
+    return dFreeSpaceMByte;
+}
 
 
 
@@ -2631,6 +2722,27 @@ void __fastcall TGlobalFuction::ReplaceStr(AnsiString &sStr, AnsiString sS, Ansi
 }
 
 
+//---------------------------------------------------------------------------
+/**
+* @fn      : int __fastcall TGlobalFuction::StringPos(const AnsiString & sSrcStr, AnsiString sSearch, Cardinal InitPos)
+* @brief   : 
+* @details : 주어진 문자열에서 시작 위치 부터 검색 문자열이 찾아지는 위치 값을 리턴 함. (찾은 경우 1 이상의 값을 리턴)
+* @param   : const AnsiString & sSrcStr : 
+* @param   : AnsiString sSearch : 
+* @param   : Cardinal InitPos : 
+* @return  : int : 0 : 못찾음, 1이상 : 찾은 문자열 위치 
+* @see     : 참고 싸이트 : http://cbuilder.borlandforum.com/impboard/impboard.dll?action=read&db=bcb_tip&no=684
+- history  : 1. [2018년 1월 17일 수요일][Song Shin Young] First. 
+**/
+int __fastcall TGlobalFuction::StringPos(const AnsiString & sSrcStr, AnsiString sSearch, Cardinal InitPos)
+{
+    if( (InitPos) >= (unsigned int)sSrcStr.Length()) return 0;
+    char *ret = NULL;
+    ret = strstr(sSrcStr.c_str() + InitPos, sSearch.c_str());
+    if( ret == NULL) return 0;
+    return  ret-sSrcStr.c_str()+1;
+}
+//---------------------------------------------------------------------------
 
 
 //---------------------------------------------------------------------------
