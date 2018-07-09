@@ -267,7 +267,7 @@ int __fastcall TGlobalFuction::DivideByIndicator(AnsiString sSrc, TStringList * 
 * @see 
 - history  : 1. [2017년 11월 17일 금요일][Song Shin Young] First. 
 **/
-int __fastcall TGlobalFuction::StringToken(String &sSrc, TStringList * sList, wchar_t *sIndicator, bool bTrim)
+int __fastcall TGlobalFuction::StringToken(UnicodeString &sSrc, TStringList * sList, const wchar_t *sIndicator, bool bTrim)
 {
     if(sList == NULL) return 0;
     else if(sSrc.Length() == 0) return 0;
@@ -309,7 +309,7 @@ int __fastcall TGlobalFuction::StringToken(String &sSrc, TStringList * sList, wc
 * @see     : 
 - history  : 1. [2017년 11월 17일 금요일][Song Shin Young] First. 
 **/
-int __fastcall TGlobalFuction::StringToken(AnsiString &sSrc, TStringList * sList, char * sIndicator, bool bTrim)
+int __fastcall TGlobalFuction::StringToken(AnsiString &sSrc, TStringList * sList, const char * sIndicator, bool bTrim)
 {
     if(sList == NULL) return 0;
     else if(sSrc.Length() == 0) return 0;
@@ -2697,14 +2697,14 @@ bool __fastcall TGlobalFuction::OpenCheckComport(char * szPort)
 * @see 
 - history : 1. [2015년 10월 23일 금요일][송신영] 최초 작성 
 **/
-void __fastcall TGlobalFuction::SetRadioGroupItemIndex(TRadioGroup *pRGroup, int Index) 
-{
-    if(pRGroup == NULL) return; 
-    TNotifyEvent OnClickEvent   = pRGroup->OnClick;
-    pRGroup->OnClick            = NULL;                    
-    pRGroup->ItemIndex          = Index;
-    pRGroup->OnClick            = OnClickEvent;
-}
+//void __fastcall TGlobalFuction::SetRadioGroupItemIndex(TRadioGroup *pRGroup, int Index)
+//{
+//    if(pRGroup == NULL) return;
+//    TNotifyEvent OnClickEvent   = pRGroup->OnClick;
+//    pRGroup->OnClick            = NULL;
+//    pRGroup->ItemIndex          = Index;
+//    pRGroup->OnClick            = OnClickEvent;
+//}
 
 
 /** 

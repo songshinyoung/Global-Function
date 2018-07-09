@@ -110,9 +110,9 @@ public:
     int  __fastcall DivideByIndicator(AnsiString sSrc, TStringList * sList, char cIndicator);
 
 
-    int __fastcall StringToken(String &sSrc, TStringList * sList, wchar_t * sIndicator, bool bTrim);
+    int __fastcall StringToken(UnicodeString &sSrc, TStringList * sList, const wchar_t * sIndicator, bool bTrim);
     
-    int __fastcall StringToken(AnsiString &sSrc, TStringList * sList, char * sIndicator, bool bTrim);
+    int __fastcall StringToken(AnsiString &sSrc, TStringList * sList, const char * sIndicator, bool bTrim);
 
 
     /** Panel_Down_ActionColor()
@@ -776,16 +776,17 @@ public:
     //---------------------------------------------------------------------------
     // Component 관리 툴 
 
-    /** SetRadioGroupItemIndex()
-    * @brief : TRadioGroup 의 ItemIndex를 변경시 OnClick Event가 발생하는데 
-               이 함수를 하용하면 OnClick Event 없이 ItemIndex를 변경할 수 있음. 
-    * @param TRadioGroup *pRGroup : 
-    * @param int Index : 
-    * @return void : 
-    * @see 
-    - history : 1. [2015년 10월 23일 금요일][송신영] 최초 작성 
-    **/
-    void __fastcall SetRadioGroupItemIndex(TRadioGroup *pRGroup, int Index);
+    /* * SetRadioGroupItemIndex()
+    * @brief : TRadioGroup 의 ItemIndex를 변경시 OnClick Event가 발생하는데
+               이 함수를 사용하면 OnClick Event 없이 ItemIndex를 변경할 수 있음.
+    * @param TRadioGroup *pRGroup :
+    * @param int Index :
+    * @return void :
+    * @see
+    - history : 1. [2015년 10월 23일 금요일][송신영] 최초 작성
+    * */
+
+    void __fastcall SetRadioGroupItemIndex(TRadioGroup * pRGroup, int Index);
 
 
     /** ReplaceStr()
